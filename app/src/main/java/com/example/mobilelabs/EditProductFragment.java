@@ -13,21 +13,21 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class EditProductFragment extends DialogFragment {
-    public String resultProduct;
+    public String resultProductName;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle bundle = this.getArguments();
-        String productName = bundle.getString("product");
+        String productName = bundle.getString("productName");
 
         getDialog().setTitle("Edit product!");
         View v = inflater.inflate(R.layout.edit_product_fragment, null);
         Button button = v.findViewById(R.id.buttonSuccess);
-        TextView textView =  v.findViewById(R.id.editTextProductNameFragment);
-        textView.setText(productName);
+        TextView textViewName =  v.findViewById(R.id.editTextProductNameFragment);
+        textViewName.setText(productName);
 
         button.setOnClickListener(u -> {
-            resultProduct = textView.getText().toString();
+            resultProductName = textViewName.getText().toString();
             dismiss();
         });
         return v;

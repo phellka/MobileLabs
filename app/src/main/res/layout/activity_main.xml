@@ -28,7 +28,7 @@
         android:layout_weight="1"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Продукт" />
+        android:text="product" />
 
     <Button
         android:id="@+id/buttonAddProduct"
@@ -53,7 +53,7 @@
         <Button
             android:id="@+id/buttonDeleteSelected"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="удалить" />
 
@@ -65,10 +65,17 @@
         <Button
             android:id="@+id/buttonEditSelected"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="изменить" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonSettings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="настройки" />
 
 
 </LinearLayout>

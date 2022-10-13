@@ -79,5 +79,16 @@
             android:layout_weight="2"
             android:text="Add" />
     </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1">
+        <Button
+            android:id="@+id/buttonSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="settings" />
+    </TableRow>
 
 </TableLayout>

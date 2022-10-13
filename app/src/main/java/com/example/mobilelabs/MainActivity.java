@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
@@ -13,13 +14,24 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.example.mobilelabs.EditProductFragment;
+import com.example.mobilelabs.storage.DBProductStorage;
+import com.example.mobilelabs.storage.FileProductStorage;
+import com.example.mobilelabs.storage.ProductsStorage;
+import com.example.mobilelabs.R;
+import com.example.mobilelabs.Settings;
+import com.example.mobilelabs.ShowSimilarProductsActivity;
+import com.example.mobilelabs.storage.product;
+import com.example.mobilelabs.storage.storageInterface;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import com.example.mobilelabs.storage.product;
 
 public class MainActivity extends AppCompatActivity implements DialogInterface.OnDismissListener {
 
-    static ProductsStorage productsStorage = new ProductsStorage();
-    ArrayAdapter<String> adapter;
+    static storageInterface productsStorage;
+    ArrayAdapter<product> adapter;
     ListView listViewProducts;
     EditProductFragment productEditFragment;
 
@@ -28,6 +40,19 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences sPref = getSharedPreferences("settings", MODE_PRIVATE);
+        if (sPref.contains("saveMode")){
+            String saveMode = sPref.getString("saveMode", "");
+            if (Objects.equals(saveMode, "DB")){
+                productsStorage = new DBProductStorage(this);
+            }
+            if (Objects.equals(saveMode, "Files")){
+                productsStorage = new FileProductStorage(this);
+            }
+        }
+        else{
+            productsStorage = new FileProductStorage(this);
+        }
 
         listViewProducts = findViewById(R.id.ListViewProducts);
         TextView textViewProductName = findViewById(R.id.editTextTextViewProduct);
@@ -39,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
         buttonAdd.setOnClickListener(v -> {
             String addedText = textViewProductName.getText().toString();
-            productsStorage.products.add(addedText);
+            productsStorage.add(new product(addedText));
             adapter.notifyDataSetChanged();
         });
 
@@ -50,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             {
                 if(sparseBooleanArray.get(i) == true)
                 {
-                    productsStorage.products.remove(i);
+                    productsStorage.delete(adapter.getItem(i));
                 }
             }
             listViewProducts.clearChoices();
@@ -59,9 +84,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
         buttonFindSimilar.setOnClickListener(v -> {
             String similar = textViewProductName.getText().toString();
-            ArrayList<String> similarProducts = productsStorage.findSimilar(similar);
             Intent intent = new Intent(this, ShowSimilarProductsActivity.class);
-            intent.putStringArrayListExtra("productsList", similarProducts);
+            intent.putExtra("productName", similar);
             startActivity(intent);
         });
 
@@ -74,28 +98,36 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             {
                 if(sparseBooleanArray.get(i) == true)
                 {
-                    product = listViewProducts.getItemAtPosition(i).toString();
+                    product = adapter.getItem(i).name;
                 }
             }
-            bundle.putString("product", product );
+            bundle.putString("productName", product );
             productEditFragment.setArguments(bundle);
             productEditFragment.show(getFragmentManager(), "editProduct");
         });
 
-        adapter = new ArrayAdapter<String>(this, R.layout.forlistview, productsStorage.products);
+        Button buttonSettings = findViewById(R.id.buttonSettings);
+        buttonSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(this, Settings.class);
+            startActivity(intent);
+        });
+
+        adapter = new ArrayAdapter<product>(this, R.layout.forlistview, productsStorage.getList());
         listViewProducts.setAdapter(adapter);
         listViewProducts.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
     @Override
     public void onDismiss(final DialogInterface dialog) {
-        String product = productEditFragment.resultProduct;
+        String product = productEditFragment.resultProductName;
         if (product != null){
             SparseBooleanArray sparseBooleanArray  = listViewProducts.getCheckedItemPositions();
             for(int i = 0; i < listViewProducts.getCount(); i++)
             {
                 if(sparseBooleanArray.get(i) == true)
                 {
-                    productsStorage.products.set(i, product);
+                    product pr = new product(product);
+                    pr.id = adapter.getItem(i).id;
+                    productsStorage.update(pr);
                 }
             }
             adapter.notifyDataSetChanged();
