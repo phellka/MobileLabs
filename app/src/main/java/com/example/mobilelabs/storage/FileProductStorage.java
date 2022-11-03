@@ -72,29 +72,43 @@ public class FileProductStorage implements storageInterface{
         return similarProducts;
     }
     private void exportToJSON() {
-        Gson gson = new Gson();
-        DataItems dataItems = new DataItems();
-        dataItems.setProducts(products);
-        String jsonString = gson.toJson(dataItems);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Gson gson = new Gson();
+                DataItems dataItems = new DataItems();
+                dataItems.setProducts(products);
+                String jsonString = gson.toJson(dataItems);
 
-        try(FileOutputStream fileOutputStream =
-                    context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
-            fileOutputStream.write(jsonString.getBytes());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                try(FileOutputStream fileOutputStream =
+                            context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
+                    fileOutputStream.write(jsonString.getBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        while(thread.isAlive()){}
     }
     private void importFromJSON() {
-        try(FileInputStream fileInputStream = context.openFileInput(fileName);
-            InputStreamReader streamReader = new InputStreamReader(fileInputStream)){
-            Gson gson = new Gson();
-            DataItems dataItems = gson.fromJson(streamReader, DataItems.class);
-            products = (ArrayList<product>) dataItems.getProducts();
-        }
-        catch (IOException ex){
-            products = new ArrayList<product>();
-            ex.printStackTrace();
-        }
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try(FileInputStream fileInputStream = context.openFileInput(fileName);
+                    InputStreamReader streamReader = new InputStreamReader(fileInputStream)){
+                    Gson gson = new Gson();
+                    DataItems dataItems = gson.fromJson(streamReader, DataItems.class);
+                    products = (ArrayList<product>) dataItems.getProducts();
+                }
+                catch (IOException ex){
+                    products = new ArrayList<product>();
+                    ex.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        while(thread.isAlive()){}
     }
     private static class DataItems {
         private List<product> products;

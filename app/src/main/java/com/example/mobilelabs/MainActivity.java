@@ -24,6 +24,7 @@ import com.example.mobilelabs.ShowSimilarProductsActivity;
 import com.example.mobilelabs.storage.product;
 import com.example.mobilelabs.storage.storageInterface;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.example.mobilelabs.storage.product;
@@ -39,6 +40,43 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        {
+            DBProductStorage dbProducts = new DBProductStorage(this);
+            FileProductStorage fileProducts = new FileProductStorage(this);
+            List<product> dbPrd = dbProducts.getList();
+            List<product> filePrd = fileProducts.getList();
+            List<product> inDb = new ArrayList<>();
+            List<product> inFile = new ArrayList<>();
+            for (int i = 0; i < filePrd.size(); ++i){
+                boolean fl = false;
+                for (int j = 0; j < dbPrd.size(); ++j) {
+                    if (Objects.equals(filePrd.get(i).name, dbPrd.get(j).name)) {
+                        fl = true;
+                    }
+                }
+                if (!fl){
+                    inDb.add(filePrd.get(i));
+                }
+            }
+            for (int i = 0; i < dbPrd.size(); ++i){
+                boolean fl = false;
+                for (int j = 0; j < filePrd.size(); ++j) {
+                    if (Objects.equals(filePrd.get(j).name, dbPrd.get(i).name)) {
+                        fl = true;
+                    }
+                }
+                if (!fl){
+                    inFile.add(dbPrd.get(i));
+                }
+            }
+            for (int i = 0; i < inDb.size(); ++i){
+                dbProducts.add(inDb.get(i));
+            }
+            for (int i = 0; i < inFile.size(); ++i){
+                fileProducts.add(inFile.get(i));
+            }
+        }
 
         SharedPreferences sPref = getSharedPreferences("settings", MODE_PRIVATE);
         if (sPref.contains("saveMode")){

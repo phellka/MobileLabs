@@ -95,18 +95,24 @@ public class DBProductStorage implements storageInterface{
     }
 
     private void importFromJSON(Context context, String fileName) {
-        try(FileInputStream fileInputStream = context.openFileInput(fileName);
-            InputStreamReader streamReader = new InputStreamReader(fileInputStream)){
-            Gson gson = new Gson();
-            DataItems dataItems = gson.fromJson(streamReader, DataItems.class);
-            products = (ArrayList<product>) dataItems.getProducts();
-            for (int i = 0; i < products.size(); ++i){
-                add(products.get(i));
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try(FileInputStream fileInputStream = context.openFileInput(fileName);
+                    InputStreamReader streamReader = new InputStreamReader(fileInputStream)){
+                    Gson gson = new Gson();
+                    DataItems dataItems = gson.fromJson(streamReader, DataItems.class);
+                    products = (ArrayList<product>) dataItems.getProducts();
+                    for (int i = 0; i < products.size(); ++i){
+                        add(products.get(i));
+                    }
+                }
+                catch (IOException ex){
+                    ex.printStackTrace();
+                }
             }
-        }
-        catch (IOException ex){
-            ex.printStackTrace();
-        }
+        });
+        thread.start();
     }
     private static class DataItems {
         private List<product> products;
@@ -136,5 +142,8 @@ public class DBProductStorage implements storageInterface{
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         }
+    }
+    public int ProductCount(){
+        return products.size();
     }
 }
