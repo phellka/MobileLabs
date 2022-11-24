@@ -4,14 +4,6 @@
     android:layout_height="match_parent"
     android:theme="@style/Theme.MobileLabs.AppWidgetContainer"
     android:orientation="vertical">
-
-    <Button
-        android:id="@+id/buttonWidgetUpdate"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:text="Update" />
-
     <TextView
         android:id="@+id/textViewWidgetText"
         android:layout_width="match_parent"

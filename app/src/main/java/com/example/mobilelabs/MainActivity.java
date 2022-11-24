@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.app.FragmentTransaction;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +15,7 @@ import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.mobilelabs.EditProductFragment;
@@ -104,6 +108,12 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             String addedText = textViewProductName.getText().toString();
             productsStorage.add(new product(addedText));
             adapter.notifyDataSetChanged();
+            Context context = this;
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.records_count_widget);
+            ComponentName thisWidget = new ComponentName(context, RecordsCountWidget.class);
+            remoteViews.setTextViewText(R.id.textViewWidgetText, "Записей в БД:" + Integer.toString(productsStorage.getList().size()));
+            appWidgetManager.updateAppWidget(thisWidget, remoteViews);
         });
 
         buttonDeleteSelected.setOnClickListener(v -> {
@@ -118,6 +128,13 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             }
             listViewProducts.clearChoices();
             adapter.notifyDataSetChanged();
+
+            Context context = this;
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.records_count_widget);
+            ComponentName thisWidget = new ComponentName(context, RecordsCountWidget.class);
+            remoteViews.setTextViewText(R.id.textViewWidgetText, "Записей в БД:" + Integer.toString(productsStorage.getList().size()));
+            appWidgetManager.updateAppWidget(thisWidget, remoteViews);
         });
 
         buttonFindSimilar.setOnClickListener(v -> {

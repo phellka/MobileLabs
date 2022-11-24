@@ -24,16 +24,15 @@ public class RecordsCountWidget extends AppWidgetProvider {
         DBProductStorage dbProductStorage = new DBProductStorage(context);
         views.setTextViewText(R.id.textViewWidgetText, "Записей в БД:" + Integer.toString(dbProductStorage.ProductCount()));
 
-        Intent updateIntent = new Intent(context, RecordsCountWidget.class);
-        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
-                new int[] { appWidgetId });
-        PendingIntent pIntent = PendingIntent.getBroadcast(context, appWidgetId, updateIntent, 0);
-        views.setOnClickPendingIntent(R.id.buttonWidgetUpdate, pIntent);
 
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
     }
 
     @Override
